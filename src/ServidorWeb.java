@@ -1,30 +1,47 @@
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-
+import java.util.Scanner;
 
 public final class ServidorWeb {
 
     public static void main(String[] args) throws IOException {
 
-        // Se crea el socket del servidor en el puerto 5000
-        ServerSocket serverSocket = new ServerSocket(5000);
-        System.out.println("Esperando la conexion...");
+        Scanner scanner = new Scanner(System.in);
+        int puerto = 0;
 
-        // El servidor queda ejecutándose indefinidamente 
+        // Se pide el puerto hasta que sea válido
+        while (puerto <= 1024) {
+            System.out.print("Ingrese el puerto del servidor (mayor a 1024): ");
+
+            if (scanner.hasNextInt()) {
+                puerto = scanner.nextInt();
+
+                if (puerto <= 1024) {
+                    System.out.println("El puerto debe ser mayor a 1024.");
+                }
+            } else {
+                System.out.println("Debe ingresar un número.");
+                scanner.next(); 
+            }
+        }
+
+        // Se crea el socket del servidor con el puerto válido
+        ServerSocket serverSocket = new ServerSocket(puerto);
+        System.out.println("Servidor escuchando en el puerto " + puerto);
+
+        // El servidor queda ejecutándose indefinidamente
         while (true) {
 
             // Espera a que un cliente se conecte
             Socket socket = serverSocket.accept();
-            System.out.println("Coonectado al servidor");
+            System.out.println("Cliente conectado");
 
-            // Se crea la solicitud HTTP asociada al cliente
             SolicitudHttp solicitud = new SolicitudHttp(socket);
 
             // Se crea un hilo para manejar la solicitud
             Thread hilo = new Thread(solicitud);
 
-            // Se inicia el hilo (multihilo)
             hilo.start();
         }
     }
