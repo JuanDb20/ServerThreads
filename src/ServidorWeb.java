@@ -30,7 +30,7 @@ public final class ServidorWeb {
         ServerSocket serverSocket = new ServerSocket(puerto);
         System.out.println("Servidor escuchando en el puerto " + puerto);
 
-        // El servidor queda ejecutándose indefinidamente
+        // El servidor se ejecuta de forma indefinidda
         while (true) {
 
             // Espera a que un cliente se conecte
