@@ -32,13 +32,27 @@ final class SolicitudHttp implements Runnable {
             String metodo = partes[0];
             String recurso = partes[1];
 
-            // Headers
+            // Lo de la validacion del get
+           if (!metodo.equals("GET")) {
+
+                    String error = "<html><body><h1>501 - Metodo no implementado</h1></body></html>";
+
+                    bw.write("HTTP/1.0 501 Not Implemented\r\n");
+                    bw.write("Content-Type: text/html\r\n");
+                    bw.write("Content-Length: " + error.length() + "\r\n");
+                    bw.write("\r\n");
+                    bw.write(error);
+                    bw.flush();
+                    return;
+                }
+
+            // ------------------------------------------
+
             String linea;
             while ((linea = br.readLine()) != null && !linea.isEmpty()) {
                 System.out.println(linea);
             }
 
-            // Recurso por defecto
             if (recurso.equals("/")) {
                 recurso = "/index.html";
             }
@@ -46,11 +60,10 @@ final class SolicitudHttp implements Runnable {
             String rutaArchivo = "www" + recurso;
             File archivo = new File(rutaArchivo);
 
-            // ------------------ 404 ------------------
+            // Lo del error 404
             if (!archivo.exists() || !archivo.isFile()) {
 
                 File archivo404 = new File("www/404.html");
-
                 StringBuilder payload404 = new StringBuilder();
 
                 if (archivo404.exists()) {
@@ -73,7 +86,7 @@ final class SolicitudHttp implements Runnable {
                 return;
             }
 
-            // ------------------ HTML ------------------
+            // html
             if (recurso.endsWith(".html")) {
 
                 BufferedReader fr = new BufferedReader(new FileReader(archivo));
@@ -93,7 +106,7 @@ final class SolicitudHttp implements Runnable {
                 bw.flush();
 
             }
-            // ------------------ IMÁGENES ------------------
+            // img
             else if (recurso.endsWith(".jpg") || recurso.endsWith(".jpeg") || recurso.endsWith(".gif")) {
 
                 String mimeType = recurso.endsWith(".gif") ? "image/gif" : "image/jpeg";
@@ -129,3 +142,4 @@ final class SolicitudHttp implements Runnable {
         }
     }
 }
+
